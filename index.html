@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Monkeytwizzle Film Timer</title>
-<link rel="stylesheet" href="animate.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.0/animate.min.css">
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <style>
@@ -45,11 +45,17 @@ button:hover {
 	font-size: 72pt;
 	margin-left: auto;
 	margin-right: auto;
-}
-#timer {
 	animation-iteration-count: infinite;
 	-moz-animation-iteration-count: infinite;
     -webkit-animation-iteration-count: infinite;
+}
+#timetext {
+	animation-iteration-count: infinite;
+	-moz-animation-iteration-count: infinite;
+    -webkit-animation-iteration-count: infinite;
+}
+#vibratebox {
+	display: none;
 }
 </style>
 </head>
@@ -57,10 +63,10 @@ button:hover {
 <div id="timings">
 	<h3>Film Development Timer<br /><small>(Based on 10 second agitation at the end of each minute)</small></h3>
 	<span>How long to run for (minutes / seconds)</span><br />
-	<input type="text" id="minutes" value="" size="4" /> / <input type="text" id="seconds" value="00" size="4" />
+	<input type="text" id="minutes" value="10" size="4" /> / <input type="text" id="seconds" value="00" size="4" />
 	<p />
-	<div class="checkbox"><input type="checkbox" id="vibrate" /> Vibrate?</div>
-	<div class="checkbox"><input type="checkbox" id="sound" /> Audio alarm?</div>
+	<div id="vibratebox"><input type="checkbox" id="vibrate" /> Vibrate?</div>
+	<div><input type="checkbox" id="sound" /> Audio alarm?</div>
 	<p />
 	<button id="start" style="width:100%">Start</button>
 </div>
@@ -76,24 +82,48 @@ function timerDecrement() {
     if(currentSeconds <= 9) currentSeconds = "0" + currentSeconds;
     if(currentMinutes <= 9) currentMinutes = "0" + currentMinutes;
     var offsetSecs = (originalSecs - totalSecs) % 60
-    if (offsetSecs >= 50 && offsetSecs <= 59) {
+    if (offsetSecs >= 5 && offsetSecs <= 59) {
     	$("#timer").addClass('animated shake');
+    	if (navigator && $("#vibrate").is(':checked')) {
+    		navigator.vibrate(500);
+    	}
+    	if ($("#sound").is(':checked') && (audioElement.paused||!audioElement.currentTime) ) {
+	    	audioElement.play();
+	    }
     } else {
     	$("#timer").removeClass('animated shake');
+    	audioElement.pause();
     }
     totalSecs--;
     if(totalSecs >= 0) {
 	    $("#timetext").text(currentMinutes + ":" + currentSeconds);
     	setTimeout('timerDecrement()',1000);
     } else {
-	    $("#timetext").text("Finished");
-    	$("#timer").addClass('animated flash');
-    	$("#restart").fadeIn();
+    	$("#timer").removeClass('animated shake');
+    	audioElement.pause();
+    	$("#timetext").fadeOut('fast',function() {
+		    $("#timetext").text("Finished");
+		    $("#timetext").fadeIn('fast',function() {
+	    		$("#timetext").addClass('animated flash');
+		    	$("#restart").fadeIn();
+		    });
+    	});
     }
 }
 totalSecs = 0;
 originalSecs = 0;
+audioElement = 0;
+navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+
 $(document).ready(function() {
+	audioElement = document.createElement('audio');
+    audioElement.setAttribute('src', 'alarm.wav');
+    audioElement.setAttribute('loop', 'loop');
+    //audioElement.setAttribute('autoplay', 'autoplay');
+
+    if (navigator.vibrate) {
+    	$("#vibratebox").show();
+    }
 	$("#start").click(function() {
 		$("#timings").hide();
 		$("#timer").show();
@@ -110,6 +140,7 @@ $(document).ready(function() {
 	$("#restart").click(function() {
 		$("#timetext").removeClass('animated flash');
 		$("#timer").fadeOut(function() {
+			$("#restart").hide();
 			$("#timings").fadeIn();
 		});
 	});
