@@ -10,3 +10,4 @@ access from any device seemed like a good lunchtime project.
 Should be hostable anywhere though only works with recent-ish 
 browsers that support the audio/vibrate api's.
 
+It should be running on my website at http://monkeytwizzle.com/phototimer/ .
