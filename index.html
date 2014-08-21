@@ -57,6 +57,11 @@ button:hover {
 #vibratebox {
 	display: none;
 }
+#credits {
+	width: 100%;
+	text-align: right;
+	font-size: 8pt;
+}
 </style>
 </head>
 <body>
@@ -69,7 +74,9 @@ button:hover {
 	<div><input type="checkbox" id="sound" /> Audio alarm?</div>
 	<p />
 	<button id="start" style="width:100%">Start</button>
-</div>
+	<div id="credits">
+		&copy; monkeytwizzle 2014
+	</div>
 </div>
 <div id="timer" style="display:none">
 	<span id="timetext"></span><br />
@@ -82,7 +89,7 @@ function timerDecrement() {
     if(currentSeconds <= 9) currentSeconds = "0" + currentSeconds;
     if(currentMinutes <= 9) currentMinutes = "0" + currentMinutes;
     var offsetSecs = (originalSecs - totalSecs) % 60
-    if (offsetSecs >= 5 && offsetSecs <= 59) {
+    if (offsetSecs >= 50 && offsetSecs <= 59) {
     	$("#timer").addClass('animated shake');
     	if (navigator && $("#vibrate").is(':checked')) {
     		navigator.vibrate(500);
