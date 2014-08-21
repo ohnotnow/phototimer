@@ -55,7 +55,7 @@ button:hover {
 </head>
 <body>
 <div id="timings">
-	<h3>Film Development Timer<br /><small>(Based on 10 second agitation per minute)</small></h3>
+	<h3>Film Development Timer<br /><small>(Based on 10 second agitation at the end of each minute)</small></h3>
 	<span>How long to run for (minutes / seconds)</span><br />
 	<input type="text" id="minutes" value="" size="4" /> / <input type="text" id="seconds" value="00" size="4" />
 	<p />
@@ -71,11 +71,12 @@ button:hover {
 </div>
 <script>
 function timerDecrement() {
-    currentMinutes = Math.floor(totalSecs / 60);
-    currentSeconds = totalSecs % 60;
+    var currentMinutes = Math.floor(totalSecs / 60);
+    var currentSeconds = totalSecs % 60;
     if(currentSeconds <= 9) currentSeconds = "0" + currentSeconds;
     if(currentMinutes <= 9) currentMinutes = "0" + currentMinutes;
-    if (currentSeconds >= 50 && currentSeconds <= 59) {
+    var offsetSecs = (originalSecs - totalSecs) % 60
+    if (offsetSecs >= 50 && offsetSecs <= 59) {
     	$("#timer").addClass('animated shake');
     } else {
     	$("#timer").removeClass('animated shake');
@@ -86,11 +87,12 @@ function timerDecrement() {
     	setTimeout('timerDecrement()',1000);
     } else {
 	    $("#timetext").text("Finished");
-    	$("#timetext").addClass('animated flash');
+    	$("#timer").addClass('animated flash');
     	$("#restart").fadeIn();
     }
 }
 totalSecs = 0;
+originalSecs = 0;
 $(document).ready(function() {
 	$("#start").click(function() {
 		$("#timings").hide();
@@ -98,6 +100,7 @@ $(document).ready(function() {
 	  	var mins = Number($("#minutes").val()) * 60;  //Set the number of minutes you need
 	    var secs = Number($("#seconds").val());
 	    totalSecs = mins + secs;	// add one as we call timerDecrement immediately so "lose" a second
+	    originalSecs = totalSecs;
 	    var currentSeconds = 0;
 	    var currentMinutes = 0;
 	    timerDecrement();
